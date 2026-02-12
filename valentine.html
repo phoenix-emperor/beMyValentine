@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); /* Fallback */
+            background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%); /* Romantic Gradient */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Prevent scrollbars from falling emojis */
+        }
+
+        /* Card Container */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            z-index: 10; /* Keep above emojis */
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Image Styling */
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Typography */
+        h1 {
+            color: #d63384; /* Deep Pink */
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+
+        .success-message {
+            color: #d63384;
+            font-size: 2rem;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap; /* allow wrapping if buttons get huge */
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        #yes-btn {
+            background-color: #2ecc71;
+            color: white;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+            position: relative;
+            z-index: 2; /* Keep above No button */
+        }
+
+        #yes-btn:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+        }
+
+        #no-btn {
+            background-color: #e74c3c;
+            color: white;
+            box-shadow: 0 4px 6px rgba(231, 76, 60, 0.3);
+        }
+
+        #no-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* Animated Emoji Styles */
+        .emoji {
+            position: fixed;
+            top: -50px;
+            font-size: 2rem;
+            z-index: 1;
+            pointer-events: none; /* Let clicks pass through */
+            animation-name: fall;
+            animation-timing-function: linear;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 480px) {
+            .card {
+                padding: 1.5rem;
+                width: 95%;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="https://via.placeholder.com/400x300/ffcccb/ff0000?text=Be+My+Valentine" alt="Romantic Valentine Placeholder">
+        
+        <div id="content">
+            <h1>Would you be my valentine?</h1>
+            <div class="btn-group">
+                <button id="yes-btn">Yes</button>
+                <button id="no-btn">No</button>
+            </div>
+        </div>
+
+        <div id="success-msg" class="success-message">
+            Yay! Happy Valentine's Day! ❤️
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const contentDiv = document.getElementById('content');
+        const successMsg = document.getElementById('success-msg');
+
+        // State for button growth
+        let yesBtnScale = 1;
+        const growthFactor = 0.2; // Grow by 20% each click
+
+        // Emojis arrays
+        const sadEmojis = ['😢', '💔', '😭', '☹️', '🥀', '💧'];
+        const happyEmojis = ['❤️', '💖', '🥰', '😍', '🌹', '✨', '💕', '💘'];
+
+        // Event Listener: No Button Click
+        noBtn.addEventListener('click', () => {
+            // 1. Grow Yes Button
+            yesBtnScale += growthFactor;
+            yesBtn.style.transform = `scale(${yesBtnScale})`;
+            
+            // Optional: decrease No button opacity or move it slightly to make it "harder" to click?
+            // For now, just keeping the requested behavior.
+
+            // 2. Trigger Sad Emoji Shower
+            createEmojiShower(sadEmojis);
+        });
+
+        // Event Listener: Yes Button Click
+        yesBtn.addEventListener('click', () => {
+            // 1. Hide buttons and question
+            contentDiv.style.display = 'none';
+            yesBtn.style.transform = 'scale(1)'; // Reset scale just in case
+
+            // 2. Show Success Message
+            successMsg.style.display = 'block';
+
+            // 3. Trigger Happy Emoji Shower
+            // Make it more intense for the celebration!
+            let interval = setInterval(() => {
+                createEmojiShower(happyEmojis);
+            }, 300);
+
+            // Stop the intense shower after 5 seconds to save resources, but keep a light trickle? 
+            // Or just a burst. Let's do a 3-second burst.
+            setTimeout(() => clearInterval(interval), 3000);
+            createEmojiShower(happyEmojis); // Immediate burst
+        });
+
+        // Function to create falling emojis
+        function createEmojiShower(emojiList) {
+            const container = document.body;
+            const particleCount = 20; // Number of emojis per click
+
+            for (let i = 0; i < particleCount; i++) {
+                const emoji = document.createElement('div');
+                emoji.classList.add('emoji');
+                
+                // Random emoji from list
+                emoji.innerText = emojiList[Math.floor(Math.random() * emojiList.length)];
+                
+                // Random position
+                const startLeft = Math.random() * 100; // 0% to 100% view width
+                
+                // Random animations
+                const duration = Math.random() * 2 + 3; // 3s to 5s fall duration
+                const delay = Math.random() * 0.5; // slight staggered start
+                const size = Math.random() * 1.5 + 1; // 1rem to 2.5rem size
+
+                emoji.style.left = `${startLeft}vw`;
+                emoji.style.animationDuration = `${duration}s`;
+                emoji.style.animationDelay = `${delay}s`;
+                emoji.style.fontSize = `${size}rem`;
+
+                container.appendChild(emoji);
+
+                // Remove element after animation finishes
+                setTimeout(() => {
+                    emoji.remove();
+                }, (duration + delay) * 1000);
+            }
+        }
+    </script>
+</body>
+</html>
