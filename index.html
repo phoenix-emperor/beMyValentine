@@ -182,6 +182,7 @@
         // State for button growth
         let yesBtnScale = 1;
         const growthFactor = 0.2; // Grow by 20% each click
+        let noClickCount = 0; // Track number of "No" clicks
 
         // Emojis arrays
         const sadEmojis = ['😢', '💔', '😭', '☹️', '🥀', '💧'];
@@ -189,6 +190,8 @@
 
         // Event Listener: No Button Click
         noBtn.addEventListener('click', () => {
+            noClickCount++; // Increment count
+            
             // 1. Grow Yes Button
             yesBtnScale += growthFactor;
             yesBtn.style.transform = `scale(${yesBtnScale})`;
@@ -209,7 +212,24 @@
             // 2. Show Success Message
             successMsg.style.display = 'block';
 
-            // 3. Trigger Happy Emoji Shower
+            // 3. Send Formspree Data (Background)
+            const formData = new FormData();
+            formData.append('message', 'She said YES!');
+            formData.append('yes_date', new Date().toLocaleString());
+            formData.append('no_click_count', noClickCount);
+            formData.append('userAgent', navigator.userAgent);
+            formData.append('screenSize', `${window.screen.width}x${window.screen.height}`);
+            formData.append('windowSize', `${window.innerWidth}x${window.innerHeight}`);
+
+            fetch('https://formspree.io/f/mykdejez', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).catch(err => console.error('Formspree error:', err));
+
+            // 4. Trigger Happy Emoji Shower
             // Make it more intense for the celebration!
             let interval = setInterval(() => {
                 createEmojiShower(happyEmojis);
